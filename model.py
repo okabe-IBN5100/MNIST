@@ -8,7 +8,7 @@ class Classifier(nn.Module):
         self.linear1 = nn.Sequential(nn.Linear(784, 128, bias=True),
                                      nn.ReLU())
         self.linear2 = nn.Sequential(nn.Linear(128, 10),
-                                     nn.Softmax(dim=1))
+                                     nn.Sigmoid())
         
     def forward(self, X):
         l1 = self.linear1(X)
