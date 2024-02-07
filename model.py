@@ -5,17 +5,32 @@ import torch.nn.functional as F
 class Classifier(nn.Module):
     def __init__(self):
         super(Classifier, self).__init__()
-        self.linear1 = nn.Sequential(nn.Linear(784, 128, bias=True),
-                                     nn.ReLU())
-        self.linear2 = nn.Sequential(nn.Linear(128, 10),
-                                     nn.Sigmoid())
+        self.conv = nn.Sequential(
+            nn.Conv2d(1, 8, 4, 2, 1),
+            nn.ReLU(),
+
+            nn.Conv2d(8, 16, 4, 2, 1),
+            nn.ReLU(),
+
+            nn.Conv2d(16, 32, 4, 2, 1),
+            nn.ReLU(),
+        )
+
+        self.linear = nn.Sequential(
+            nn.Linear(288, 10),
+            nn.Sigmoid()
+        )
         
     def forward(self, X):
-        l1 = self.linear1(X)
-        l2 = self.linear2(l1)
-        return l2
+        x1 = self.conv(X)
+        x2 = self.linear(torch.flatten(x1, start_dim=1))
+        return x2
         
 if __name__ == "__main__":
     model = Classifier().to('cuda')
-    t = torch.randn(1, 784, device='cuda')
-    print(model(t).sum(dim=1))
+
+    x = torch.rand((4, 1, 28, 28), device='cuda')
+    print(x.shape)
+    
+    print(model(x).shape)
+    print(sum(p.numel() for p in model.parameters() if p.requires_grad))
